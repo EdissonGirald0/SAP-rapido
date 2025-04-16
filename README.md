@@ -1,94 +1,178 @@
-**guía rápida de SAP para almacenamiento** (módulo **WM - Warehouse Management** o **MM - Materials Management**), con comandos clave y ejemplos de uso:
+
+## **GUÍA DE SAP PARA ALMACENAMIENTO (Módulo WM/MM)**
 
 ---
 
-### **1. Transacciones clave para almacenamiento**
+### **1. Recepción de Mercancía (Goods Receipt - GR)**  
+**Transacción: `MIGO`**  
+**Propósito:** Registrar la entrada de materiales al almacén (ej: desde proveedores o producción).  
 
-| **Transacción** | **Descripción** | **Uso común** |
-|------------------|-----------------|----------------|
-| **MIGO**         | Gestión de movimientos de mercancía | Entradas/salidas de mercancía, transferencias. |
-| **MB1A**         | Retirada de material (consumo) | Retirar stock por daños o mermas. |
-| **MB1B**         | Transferencia de stock | Movimientos entre almacenes o ubicaciones. |
-| **LT01**         | Crear orden de transporte (TO) | Mover mercancía dentro del almacén. |
-| **LT03**         | Confirmar orden de transporte | Registrar la ejecución de una TO. |
-| **LS01N**        | Gestión de ubicaciones | Consultar o gestionar ubicaciones de almacén. |
-| **MI31**         | Crear documento de inventario físico | Iniciar un conteo físico. |
-| **MI32**         | Introducir resultados de inventario | Registrar cantidades contadas. |
-| **MI33**         | Analizar diferencias de inventario | Comparar conteo físico vs. sistema. |
-| **VL06O**        | Monitor de entregas pendientes | Verificar órdenes de entrega pendientes. |
-| **MB51**         | Lista de movimientos de material | Histórico de entradas/salidas. |
-| **MB52**         | Stock en almacén | Consultar stock disponible por ubicación. |
+**Pasos:**  
+1. **Abrir transacción:**  
+   - Escribe `/nMIGO` en la barra de comandos y pulsa **Enter**.  
+2. **Seleccionar parámetros:**  
+   - En **"Material Document"**, elige:  
+     - **Movement Type:** `101` (Entrada de compra).  
+     - **Document Date:** Fecha actual.  
+     - **Posting Date:** Fecha de contabilización.  
+   - Haz clic en **Purchase Order** y escribe el número de pedido (ej: `4500001234`).  
+3. **Verificar datos:**  
+   - SAP cargará automáticamente los materiales y cantidades del pedido.  
+   - Revisa que coincidan con la mercancía recibida (ej: 100 botellas de vino).  
+4. **Especificar ubicación:**  
+   - En la columna **"Storage Location"**, ingresa la ubicación de destino (ej: `0001` para almacén principal).  
+   - Si el material requiere un lote, usa **F4** para seleccionarlo.  
+5. **Confirmar y guardar:**  
+   - Pulsa **Enter** y luego **"Post"** (icono de disco).  
+   - **¡Listo!** Anota el **Material Document Number** generado (ej: `4900005678`).
 
----
-
-### **2. Pasos básicos para operaciones comunes**
-
-#### **A. Recepción de mercancía (Goods Receipt)**
-1. **Transacción: `MIGO`**  
-   - Seleccionar **"Goods Receipt"** → **"Purchase Order"** (si hay orden de compra).  
-   - Ingresar **número de pedido (PO)** y validar.  
-   - Confirmar cantidad y ubicación de almacén (campo **"Storage Location"**).  
-   - Guardar con **Enter** y luego **"Post"** (se genera un **Material Document Number**).
-
-#### **B. Preparar envío (Goods Issue)**
-1. **Transacción: `MIGO`**  
-   - Seleccionar **"Goods Issue"** → **"A01: Delivery to Customer"**.  
-   - Ingresar **número de entrega (Delivery)** o material.  
-   - Especificar cantidad y ubicación de salida.  
-   - **Post** para registrar la salida.
-
-#### **C. Movimiento interno (Transferencia)**
-1. **Transacción: `LT01`**  
-   - Ingresar **material**, **cantidad**, **ubicación origen** y **ubicación destino**.  
-   - Guardar para generar la **orden de transporte (TO Number)**.  
-2. **Transacción: `LT03`**  
-   - Ingresar el **TO Number** y confirmar el movimiento.
-
-#### **D. Inventario físico**
-1. **Transacción: `MI31`** → Crear documento de conteo.  
-2. **Transacción: `MI32`** → Ingresar resultados del conteo.  
-3. **Transacción: `MI33`** → Analizar y ajustar diferencias.
+**Errores comunes:**  
+- Si aparece **"Material X no existe en la ubicación Y"**, verifica que el material esté asignado a la ubicación en el maestro de materiales (transacción `MM02`).  
 
 ---
 
-### **3. Comandos rápidos y atajos**
-- **/n + código de transacción**: Abrir una transacción nueva (ej: `/nMIGO`).  
-- **/o**: Abrir una nueva sesión sin cerrar la actual.  
-- **/nex**: Salir de SAP inmediatamente.  
-- **F4**: Ayuda para buscar datos (ej: códigos de material).  
-- **F1**: Ayuda contextual (información sobre un campo).  
-- **F8**: Ejecutar un reporte (ej: en MB51 o MB52).  
-- **Ctrl + Y**: Borrar una línea en una tabla.  
+### **2. Preparar Envío (Goods Issue - GI)**  
+**Transacción: `MIGO`**  
+**Propósito:** Registrar la salida de materiales (ej: ventas, devoluciones).  
+
+**Pasos:**  
+1. **Abrir transacción:**  
+   - Ejecuta `/nMIGO`.  
+2. **Configurar movimiento:**  
+   - Selecciona **"Goods Issue"** → **Movement Type:** `601` (Entrega a cliente).  
+   - Ingresa el **número de entrega** (Delivery) o el material directamente.  
+3. **Detallar la salida:**  
+   - En **"Material"**, escribe el código (ej: `VINO_ROJO_001`).  
+   - En **"Quantity"**, ingresa la cantidad a despachar (ej: `50` unidades).  
+   - En **"Storage Location"**, confirma la ubicación de salida (ej: `0001`).  
+4. **Validar y guardar:**  
+   - Usa **F8** para simular el movimiento antes de guardar.  
+   - Si todo está correcto, haz clic en **"Post"**.  
+
+**Ejemplo práctico:**  
+- **MovType 261**: Para retirar material dañado (ej: 10 botellas rotas).  
+  - En **"Movement Type"**, usa `261` y selecciona la razón (ej: `RA1` para "Daño en almacén").  
 
 ---
 
-### **4. Consejos para evitar errores**
-- **Verifica siempre**:  
-  - **Número de material**, **cantidad** y **ubicación**.  
-  - **MovType** (tipo de movimiento: 101 = entrada, 261 = salida, etc.).  
-- Usa **F1** para entender el significado de los campos.  
-- Si hay un error, revisa los **mensajes en la barra inferior** (ej: "Material X no existe en la ubicación Y").  
+### **3. Transferir Materiales Internamente (Orden de Transporte - TO)**  
+**Transacciones: `LT01` (crear) y `LT03` (confirmar)**  
+**Propósito:** Mover stock entre ubicaciones (ej: de zona de recepción a estanterías).  
+
+**Pasos:**  
+1. **Crear orden de transporte (`LT01`):**  
+   - Ejecuta `/nLT01`.  
+   - Completa los campos:  
+     - **Material:** `VINO_BLANCO_002`.  
+     - **Cantidad:** `200`.  
+     - **Ubicación origen:** `RECEPCION`.  
+     - **Ubicación destino:** `ESTANTERIA_A1`.  
+   - Pulsa **Enter** para generar el **TO Number** (ej: `TO123456`).  
+
+2. **Confirmar movimiento (`LT03`):**  
+   - Ejecuta `/nLT03`.  
+   - Ingresa el **TO Number** y haz clic en **"Confirmation"**.  
+   - Verifica que la cantidad y ubicaciones sean correctas.  
+   - Guarda con **"Save"**.  
+
+**Nota:** Si el movimiento requiere varios pasos (ej: picking → packing), usa `LT0C` para confirmaciones parciales.  
 
 ---
 
-### **5. Ejemplo práctico: Registrar entrada de mercancía**
-1. Ejecuta `/nMIGO`.  
-2. Selecciona **"Goods Receipt"** → **"Purchase Order"**.  
-3. Ingresa el **PO Number** y haz clic en **"Enter"**.  
-4. Verifica los datos automáticos (material, cantidad).  
-5. Completa la **Storage Location** (ej: "0001").  
-6. Haz clic en **"Post"** (✓).  
-7. Anota el **Material Document Number** generado (ej: "4900001234").  
+### **4. Realizar Inventario Físico**  
+**Transacciones: `MI31` (crear), `MI32` (registrar), `MI33` (ajustar)**  
+**Propósito:** Asegurar que el stock físico coincida con SAP.  
+
+**Proceso completo:**  
+1. **Crear documento de inventario (`MI31`):**  
+   - Ejecuta `/nMI31`.  
+   - Selecciona **"Plant"** (ej: `PL001`) y **"Storage Location"** (ej: `0001`).  
+   - Elige el tipo de conteo (ej: `01` para conteo cíclico).  
+   - Genera el **Documento de Inventario** (ej: `INV_202310`).  
+
+2. **Contar y registrar (`MI32`):**  
+   - Ejecuta `/nMI32`.  
+   - Ingresa el **Documento de Inventario** y el material.  
+   - Anota la cantidad física contada (ej: `950` botellas).  
+   - Guarda los resultados.  
+
+3. **Analizar diferencias (`MI33`):**  
+   - Ejecuta `/nMI33`.  
+   - Ingresa el documento y revisa las diferencias.  
+   - Si hay discrepancias, ajusta el stock con **"Post Difference"**.  
+
+**Consejo:** Usa **MB52** antes del conteo para ver el stock según SAP y comparar.  
 
 ---
 
-### **6. Documentación adicional**
-- **MMBE**: Consultar niveles de stock por material.  
-- **COGI**: Gestión de inconsistencias en almacén.  
-- **LS24**: Lista de órdenes de transporte pendientes.  
+### **5. Consultar Stock en Tiempo Real**  
+**Transacción: `MB52`**  
+**Propósito:** Verificar disponibilidad de materiales por ubicación.  
+
+**Pasos:**  
+1. Ejecuta `/nMB52`.  
+2. Completa los filtros:  
+   - **Material:** `VINO_TINTO_003`.  
+   - **Planta:** `PL001`.  
+   - **Storage Location:** `0001`.  
+3. Pulsa **F8** para ejecutar el reporte.  
+4. **Resultado:** Verás columnas como:  
+   - **Unrestricted Stock:** Stock disponible.  
+   - **Blocked Stock:** Material bloqueado (ej: en cuarentena).  
 
 ---
 
-### **Nota importante**  
-Los comandos pueden variar según la versión de SAP y la configuración de la empresa.  
-¡Siempre verifica con tu supervisor o manual interno los procesos específicos de tu organización!
+### **6. Movimiento Rápido de Stock (Transfer Posting)**  
+**Transacción: `MB1B`**  
+**Propósito:** Transferir material entre ubicaciones sin orden de transporte.  
+
+**Pasos:**  
+1. Ejecuta `/nMB1B`.  
+2. Selecciona **Movement Type:** `311` (Transferencia entre ubicaciones).  
+3. Ingresa:  
+   - **Material:** `VINO_ROSADO_004`.  
+   - **Cantidad:** `100`.  
+   - **Ubicación origen:** `ESTANTERIA_A1`.  
+   - **Ubicación destino:** `ZONA_PROMO`.  
+4. Guarda con **"Post"**.  
+
+**Nota:** Este movimiento no genera una orden de transporte (TO), por lo que es ideal para correcciones rápidas.  
+
+---
+
+### **7. Gestionar Errores con COGI**  
+**Transacción: `COGI`**  
+**Propósito:** Resolver inconsistencias en el almacén (ej: diferencias entre stock físico y SAP).  
+
+**Pasos:**  
+1. Ejecuta `/nCOGI`.  
+2. Filtra por ubicación o material.  
+3. Selecciona la inconsistencia y haz clic en **"Process"**.  
+4. Corrige el error (ej: ajustar stock o eliminar entradas duplicadas).  
+
+---
+
+### **8. Atajos y Recomendaciones Clave**  
+- **F1 + Click en campo:** Muestra ayuda detallada sobre un campo específico.  
+- **MB51:** Histórico de movimientos (ej: ver todas las salidas de un material).  
+- **LS26:** Monitor de stock en tiempo real por ubicación.  
+- **Siempre:**  
+  - Valida **Movement Type** antes de guardar.  
+  - Usa **F8** para simular transacciones críticas.  
+
+---
+
+### **Ejemplo Integrado: Recepción + Almacenamiento**  
+1. **Recibir 500 botellas de vino:**  
+   - Usa `MIGO` (MovType `101`) con PO `4500005678`.  
+2. **Transferir a estantería:**  
+   - Crea TO en `LT01` desde `RECEPCION` a `ESTANTERIA_B2`.  
+3. **Verificar stock:**  
+   - Ejecuta `MB52` para confirmar que las 500 unidades están en `ESTANTERIA_B2`.  
+
+---
+
+### **Diagrama de Flujo de Operaciones**  
+```
+Recepción (MIGO) → Transferir (LT01/LT03) → Inventario (MI31/MI33) → Envío (MIGO)
+```
